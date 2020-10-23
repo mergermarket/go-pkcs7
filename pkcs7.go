@@ -22,6 +22,11 @@ func Unpad(padded []byte, size int) ([]byte, error) {
 
 	lastPad := padded[paddedLen-1]
 	padLen := int(lastPad)
+
+	if padLen > size {
+		return nil, errors.New("pkcs7: Padded value larger than size.")
+	}
+
 	for i := paddedLen - padLen; i < paddedLen; i++ {
 		if padded[i] != lastPad {
 			return nil, errors.New("pkcs7: Padded value wasn't in correct format.")
