@@ -14,11 +14,26 @@ func Pad(buf []byte, size int) ([]byte, error) {
 }
 
 func Unpad(padded []byte, size int) ([]byte, error) {
-	if len(padded)%size != 0 {
+	paddedLen := len(padded)
+
+	if paddedLen%size != 0 {
 		return nil, errors.New("pkcs7: Padded value wasn't in correct size.")
 	}
 
-	bufLen := len(padded) - int(padded[len(padded)-1])
+	lastPad := padded[paddedLen-1]
+	padLen := int(lastPad)
+
+	if padLen > size {
+		return nil, errors.New("pkcs7: Padded value larger than size.")
+	}
+
+	for i := paddedLen - padLen; i < paddedLen; i++ {
+		if padded[i] != lastPad {
+			return nil, errors.New("pkcs7: Padded value wasn't in correct format.")
+		}
+	}
+
+	bufLen := paddedLen - padLen
 	buf := make([]byte, bufLen)
 	copy(buf, padded[:bufLen])
 	return buf, nil

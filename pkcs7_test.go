@@ -26,6 +26,22 @@ func TestPkcs7(t *testing.T) {
 		}
 	})
 
+	t.Run("Unpads error length", func(t *testing.T) {
+		_, err := Unpad([]byte("123456789012345678901234567890123456789012345678901234567890\x11\x11\x11\x11"), BLOCK_SIZE)
+		if err == nil {
+			panic(fmt.Sprint("process error"))
+		}
+
+	})
+
+	t.Run("Unpads error format", func(t *testing.T) {
+		_, err := Unpad([]byte("12345678901\x06\x06\x06\x06\x06"), BLOCK_SIZE)
+		if err == nil {
+			panic(fmt.Sprint("process error"))
+		}
+
+	})
+
 	t.Run("Handles long", func(t *testing.T) {
 		longStr := []byte("123456789012345678901234567890123456789012345678901234567890")
 		padded, _ := Pad(longStr, BLOCK_SIZE)
